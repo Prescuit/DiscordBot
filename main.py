@@ -1,35 +1,31 @@
 import os
 import discord
 import datetime
+import random
+import json
 from keep_alive import keep_alive
 from discord.ext import commands
+from scripts.channel_msg import *
 
-bot = commands.Bot(
-	command_prefix="!",  # Change to desired prefix
-	case_insensitive=True  # Commands aren't case-sensitive
-)
+bot_client = commands.Bot(command_prefix="!")
+@bot_client.command()
+async def load(ctx, extension):
+    bot_client.load_extension(f'cogs.{extension}')
 
 bot.author_id = os.environ.get("DISCORD_ID")   # Change to your discord id!!!
 
 @bot.event 
 async def on_ready():  # When the bot is ready
     print("I'm in")
-    print(bot.user)  # Prints the bot's username and identifier
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="Kenny G"))
 
-
-extensions = [
-	'cogs.cog_example'  # Same name as it would be if you were importing it
-]
-
-if __name__ == '__main__':  # Ensures this is the file being ran
-	for extension in extensions:
-		bot.load_extension(extension)  # Loades every extension.
 
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
+
+    msg = str(message.content).lower()
 
     if not message.guild:
       print(message.content)
@@ -39,10 +35,14 @@ async def on_message(message):
       await message.channel.send(message.content + " - " + str(message.author))
       return
 
-    if message.content == '!awakebot':
-        response = 'https://tenor.com/3YVH.gif'
+    if 'f' in msg:
+        aFoo(msg)
+        with open('data/data.json') as f:
+            data = json.load(f)
+        i = random.randint(0, len(data['f'])-1)
+        response = data['f'][i]
         await message.channel.send(response)
-
+    #elif message.content =
 
 keep_alive()  # Starts a webserver to be pinged.
 token = os.environ.get("DISCORD_BOT_SECRET") 
