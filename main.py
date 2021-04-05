@@ -1,18 +1,31 @@
 import os
 import discord
-import datetime
-import random
 import json
 from keep_alive import keep_alive
 from discord.ext import commands
-from scripts.channel_msg import *
 
-bot_client = commands.Bot(command_prefix="!")
-@bot_client.command()
-async def load(ctx, extension):
-    bot_client.load_extension(f'cogs.{extension}')
+#local imports
+from scripts.channel_msg import handleMessage
+from scripts.direct_msg import handleDMMessage
+from classes.reaction_class import ReactionClass
+from classes.reddit_class import FetchReddit
+from scripts.log import logMessage
 
-bot.author_id = os.environ.get("DISCORD_ID")   # Change to your discord id!!!
+bot = commands.Bot(command_prefix="!")
+
+with open('data/response.json') as f:
+    data = json.load(f)
+class_list = []
+for key in data:
+    class_list.append(ReactionClass(key, data[key]))
+
+command_list = []
+with open('data/commands.json') as f:
+    data = json.load(f)
+for sub in data['reddit']:
+    command_list.append(FetchReddit(sub))
+
+bot.author_id = os.environ.get("DISCORD_ID")
 
 @bot.event 
 async def on_ready():  # When the bot is ready
@@ -25,24 +38,17 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    msg = str(message.content).lower()
+    try:
+      if not message.guild:
+        await handleDMMessage(message, class_list, command_list, bot)
+        return
+      else:
+        await handleMessage(message, class_list, command_list)
+    except Exception as e:
+      err = "\nAn exception occured: " + str(e)
+      logMessage(err)
+      print(err)
 
-    if not message.guild:
-      print(message.content)
-      f = open("console.log", "a")
-      f.write("\n"+"["+str(datetime.datetime.now())+"] - "+str(message.author)+": "+message.content)
-      f.close()
-      await message.channel.send(message.content + " - " + str(message.author))
-      return
-
-    if 'f' in msg:
-        aFoo(msg)
-        with open('data/data.json') as f:
-            data = json.load(f)
-        i = random.randint(0, len(data['f'])-1)
-        response = data['f'][i]
-        await message.channel.send(response)
-    #elif message.content =
 
 keep_alive()  # Starts a webserver to be pinged.
 token = os.environ.get("DISCORD_BOT_SECRET") 

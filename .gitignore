@@ -132,3 +132,8 @@ dmypy.json
 .pyc
 .DS_Store
 .log
+
+sandbox/
+poetry.lock
+pyproject.toml
+data/logs.txt

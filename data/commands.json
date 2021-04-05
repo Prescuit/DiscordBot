@@ -1,0 +1,14 @@
+{
+    "reddit": [
+        "pug",
+        "aww",
+        "cute",
+        "rarepuppers"
+    ],
+    "reddit2": [{
+      "pug": [{ "description":"Returns random pug image from Reddit"}],
+      "aww": [{"description":"Returns random aww image from Reddit"}],
+      "cute": [{"description":"Returns random cure image from Reddit"}],
+      "rarepuppers": [{"description":"Returns random rare pupper image from Reddit"}]
+    }]
+}
